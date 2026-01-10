@@ -1,5 +1,6 @@
 const pool = require("../../config/db");
-
+const { uploadToBucket } = require("../../upload");
+const fs=require('fs')
 exports.addPapers = async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
@@ -10,10 +11,11 @@ exports.addPapers = async (req, res) => {
     const savedFiles = [];
 
     for (const file of req.files) {
+            const publicUrl = await uploadToBucket(file.buffer, file.originalname);
       const result = await pool.query(
         `INSERT INTO samplePapers 
-         (class_Id,subject_Id,set_Id,year_Id,original_name, file_name,mime_type)
-         VALUES ($1, $2,$3,$4,$5,$6,$7)
+         (class_Id,subject_Id,set_Id,year_Id,original_name, file_name,mime_type,file_url)
+         VALUES ($1, $2,$3,$4,$5,$6,$7,$8)
          RETURNING *`,
         [
           class_id,
@@ -23,6 +25,7 @@ exports.addPapers = async (req, res) => {
           file.originalname,
           file.filename,
           file.mimetype,
+          publicUrl
         ]
       );
 
@@ -30,11 +33,11 @@ exports.addPapers = async (req, res) => {
     }
 
     res.status(200).json({
-      message: "Files uploaded & saved to database successfully",
+      message: "Files uploaded successfully",
       files: savedFiles,
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+   return res.status(500).json({ error: error.message });
   }
 };
 exports.fetchPapers = async (req, res) => {

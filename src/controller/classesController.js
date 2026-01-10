@@ -47,7 +47,6 @@ exports.fetchSubjects = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 exports.fetchYear = async (req, res) => {
   try {
     const fetchYear=await pool.query('select * from years')
