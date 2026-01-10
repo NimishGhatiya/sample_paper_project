@@ -57,7 +57,7 @@ exports.fetchPapers = async (req, res) => {
         sp.original_name,
         sp.file_name,
         sp.mime_type,
-    ($5 || sp.file_name) AS file_url,
+        sp.file_url,
         sp.created_at,
 
         c.class_name,
@@ -79,7 +79,7 @@ exports.fetchPapers = async (req, res) => {
 
       ORDER BY sp.created_at DESC
       `,
-      [class_id, year_id, set_id, subject_id,process.env.BASE_URL]
+      [class_id, year_id, set_id, subject_id]
     );
 
     res.status(200).json({
